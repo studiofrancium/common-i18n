@@ -16,9 +16,9 @@ publishing {
             artifactId = artifactoryPublishJavaArtifactName
             version = versionTag
             pom {
-                name = 'Common Java Library'
-                description = 'Kotlin Common to Java 11'
-                url = 'https://gitlab.dev.acme.corp/gitlab/studiofrancium/common-kotlin.git'
+                name = artifactoryPublishJavaArtifactPomName
+                description = artifactoryPublishJavaArtifactPomDescription
+                url = artifactoryPublishJavaArtifactPomUrl
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
