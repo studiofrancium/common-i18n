@@ -1,0 +1,14 @@
+apply plugin: "org.sonarqube"
+
+file("$rootProject.projectDir/sonar-project.properties").withReader {
+    Properties sonarProperties = new Properties()
+    sonarProperties.load(it)
+
+    sonarProperties.each { key, value ->
+        sonarqube {
+            properties {
+                property key, value
+            }
+        }
+    }
+}

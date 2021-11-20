@@ -1,0 +1,41 @@
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
+
+tasks.withType(PublishToMavenRepository) {
+    doFirst {
+        println("Publishing ${publication.groupId}:${publication.artifactId}:${publication.version} to ${repository.url} with user ${project.artifactoryPublishUser}")
+    }
+}
+
+def versionTag = "$project.version-jre$project.javaVersion"
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifactId = artifactoryPublishJavaArtifactName
+            version = versionTag
+            pom {
+                name = 'Common Java Library'
+                description = 'Kotlin Common to Java 11'
+                url = 'https://gitlab.dev.acme.corp/gitlab/studiofrancium/common-kotlin.git'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name "artifactory-nexus"
+            url project.artifactoryMavenUrl
+            credentials {
+                username project.artifactoryPublishUser
+                password project.artifactoryPublishPassword
+            }
+        }
+    }
+}

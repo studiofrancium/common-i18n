@@ -1,0 +1,52 @@
+apply plugin: "kotlin"
+apply plugin: "kotlin-kapt"
+apply plugin: "kotlin-allopen"
+apply plugin: "org.jlleitschuh.gradle.ktlint"
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-debug:${kotlinxCoroutinesVersion}"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-reactor:${kotlinxCoroutinesVersion}"
+
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:${jupiterVersion}"
+    testImplementation "org.assertj:assertj-core:${assertjVersion}"
+}
+
+[compileKotlin, compileTestKotlin]*.with {
+    kotlinOptions {
+        jvmTarget = "11"
+        javaParameters = true
+        freeCompilerArgs = ["-Xjvm-default=enable"]
+    }
+}
+
+ktlint {
+    //See more options: https://github.com/JLLeitschuh/ktlint-gradle#configuration
+    ignoreFailures = true
+    disabledRules = ["no-wildcard-imports", "filename"]
+}
+
+sourceSets {
+    main.kotlin.srcDirs += 'src/main/kotlin'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+compileKotlin.dependsOn ktlintFormat
+
+if (!Boolean.getBoolean("skipJacoco")) {
+    apply from: rootProject.file("gradle/jacoco.gradle")
+    jacocoTestReport {
+        // Add Kotlin sources to Jacoco source dirs
+        sourceDirectories.from += sourceSets.main.kotlin.srcDirs
+    }
+    check.dependsOn jacocoTestReport
+}
+
+if (!Boolean.getBoolean("skipDetekt")) {
+    apply from: rootProject.file("gradle/detekt.gradle")
+}

@@ -1,0 +1,29 @@
+apply plugin: "io.gitlab.arturbosch.detekt"
+
+detekt {
+    toolVersion = gradleDetektPluginVersion
+    parallel = true
+    debug = false
+    input = files("src/main/kotlin")
+    config = rootProject.files("style/detekt-config.yml")
+    buildUponDefaultConfig = true
+    reports {
+        xml {
+            enabled = true
+            destination = file("build/reports/detekt/detekt.xml")
+        }
+        html {
+            enabled = true
+            destination = file("build/reports/detekt/detekt.html")
+        }
+    }
+}
+
+if (!Boolean.getBoolean("skipSonar")) {
+    apply from: rootProject.file("gradle/sonar.gradle")
+    sonarqube {
+        properties {
+            property "sonar.kotlin.detekt.reportPaths", detekt.reports.xml.destination
+        }
+    }
+}

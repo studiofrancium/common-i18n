@@ -1,0 +1,45 @@
+defaultTasks "clean", "build"
+group "ee.studiofrancium.common"
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
+        classpath "org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}"
+        classpath "org.jetbrains.kotlin:kotlin-noarg:${kotlinVersion}"
+        classpath "org.jlleitschuh.gradle:ktlint-gradle:${gradleKlintPluginVersion}"
+        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:${gradleDetektPluginVersion}"
+        classpath "com.palantir.gradle.gitversion:gradle-git-version:${gradleGitPluginVersion}"
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:${gradleSonarqubePluginVersion}"
+    }
+}
+
+assert System.properties["java.specification.version"] == "11" || "12" || "13" || "14" || "15" || "16"
+
+apply plugin: "com.palantir.git-version"
+def versionTxt = "v" + new Date().format('yyyyMMdd') + "-" + versionDetails().gitHash
+version(versionTxt)
+
+repositories {
+    mavenCentral()
+}
+
+apply from: rootProject.file("gradle/kotlin.gradle")
+apply from: rootProject.file("gradle/java-publish.gradle")
+
+if (!Boolean.getBoolean("skipJacoco")) {
+    apply from: rootProject.file("gradle/jacoco.gradle")
+}
+
+if (!Boolean.getBoolean("skipSonar")) {
+    apply from: rootProject.file("gradle/sonar.gradle")
+}
+
+dependencies {
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:${jupiterVersion}"
+    testImplementation "org.assertj:assertj-core:${assertjVersion}"
+}
