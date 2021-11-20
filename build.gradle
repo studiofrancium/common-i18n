@@ -1,5 +1,5 @@
 defaultTasks "clean", "build"
-group "ee.studiofrancium.common"
+group "ee.studiofrancium"
 
 buildscript {
     repositories {
